@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>HtmlFlashPlayer</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+</head>
+<p>
+	CDS-IS FMS Web Player
+</p>
+
+<body>
+
+<form name="htmlForm" method="post" action="javascript:formSend();">
+  Please input URL Here: rtmp://rfqdn/vod/sample or rtmp://rfqdn/vod/USINGPLAYLIST<br />
+  <input type="text" size="120" name="sendField" value="rtmp://flash.auto.com/vod/sample" /><br />
+  Please input Play list here: seprated by comma <br />
+  <input type="text" name="StreamList" size="120" value="NA" /><br />
+  Please input Switching/Swap list here: Oldstream,newStream <br />
+  <input type="text" name="SwitchStreamList" size="120" value="NA" /><br />
+  Default:
+  <input type="radio" checked="checked" name="AppType" value="Default"/>
+  VOD:
+  <input type="radio" name="AppType" value="VOD"/>
+  Live:
+  <input type="radio" name="AppType" value="LIVE"/>
+  DVR:
+  <input type="radio" name="AppType" value="DVR"/><br />
+  <input type="submit" value="Start" /> <br />
+  You can see the Logs here:<br />
+  <textarea rows="5"  cols="80" name="PlayerResult" id="PlayerResult" value="NA" ></textarea>
+</form>
+<div>
+	<!--
+	<select name="StreamList1" id="StreamList1" multiple="multiple">
+		<option value="1">mp4:sample1_1500kbps.f4v</option>
+		<option value="2">mp4:sample1_1000kbps.f4v</option>
+		<option value="3">sample</option>
+	</select>
+	<input type="button" value="Adding" onclick="addingItemsTolist()" />
+	!-->
+	<select name="StreamList2" id="StreamList2">
+	</select>
+</div>
+
+<script type="text/javascript" language="JavaScript">
+document.write(
+  '<OBJECT classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"\n'+
+  ' codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"\n'+
+  ' WIDTH="550" HEIGHT="400" id="HtmlPlayer">\n'+
+  ' <PARAM NAME=movie VALUE="testClient.swf">\n'+
+  ' <PARAM NAME=quality VALUE=high>\n'+
+  ' <PARAM NAME=bgcolor VALUE=#FFFFFF>\n'+
+  ' <EMBED src="testClient.swf"\n'+
+  '    quality=high bgcolor=#FFFFFF  WIDTH="550" HEIGHT="400" NAME="HtmlPlayer"\n'+
+  '    TYPE="application/x-shockwave-flash"\n'+
+  '    PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer"></EMBED>\n'+  
+  '</OBJECT>');</script>
+<script type="text/javascript" language="JavaScript">
+	var streamList = new Array();
+	var switchStreamList = new Array();
+	/*
+	function addingItemsTolist() {
+		var list1 = document.getElementById("StreamList1");
+		var list2 = document.getElementById("StreamList2");
+		for(var i = list1.options.length-1;i>=0;i--) {
+			streamList.push(list1.options[i].text);
+			//alert("text"+list1.options[i].text);
+			list2.appendChild(list1.options[i]);
+			//alert("dd");
+			
+		}
+	}
+	*/
+	function getFlashMovie(movieName) {
+		var isIE = navigator.appName.indexOf("Microsoft") != -1;
+		return (isIE) ? window[movieName] : document[movieName];
+	}
+	function formSend() {
+		var inputurl = document.htmlForm.sendField.value;
+		//var strStreamList = streamList.join("@");
+		var strStreamList = document.htmlForm.StreamList.value;
+		//alert(strStreamList);
+		var mystreamlist = new Array();
+		mystreamlist = strStreamList.split(",");
+		var strSwitchStreamList = document.htmlForm.SwitchStreamList.value;
+		switchStreamList = strSwitchStreamList.split(",");
+		if(mystreamlist.length < 2 && inputurl.match(/USINGPLAYLIST/)) {
+			alert("Play list should inlcude more than 1 item");
+		} else {
+			var list2 = document.getElementById("StreamList2");
+			for(var i = 0; i < mystreamlist.length;i++) {
+				//alert(mystreamlist[i]);
+				//var node = document.createElement('option');
+				//node.text = mystreamlist[i];
+				//list2.add(node,null);
+			}
+		}
+		var obj = document.getElementById("PlayerResult");
+		obj.value = "Init...\r\n";
+		//Get the Apptype from user input (radio button)
+		var myRadioObjs = document.getElementsByName("AppType");
+		var myAppType = "VOD";
+		//alert(myRadioObjs.length);
+		for(var j= 0; j < myRadioObjs.length;j++) {
+			if(myRadioObjs[j].checked) {
+				myAppType = myRadioObjs[j].value;
+			}
+		}
+		getFlashMovie("HtmlPlayer").sendCmdToFlash(inputurl,strStreamList,myAppType);
+	}
+ 
+	function getTextFromFlash(str) {
+		var obj = document.getElementById("statusinfo");
+		obj.value = "Flash Client Status"+"\r\n"+str;
+		return str;
+		//document.statusform.statusinfo.value = "Flash Client Status"+"\r\n"+str;
+		//return str + " received";
+	}
+	function getResultFromFlash(str) {
+		var obj = document.getElementById("PlayerResult");
+		str += "\r\n";
+		obj.value += str;
+		return str;
+	}
+	function PlayFlash() {
+		getFlashMovie("HtmlPlayer").sendCtrlToFlash("PLAY");
+	}
+	function StopFlash() {
+		getFlashMovie("HtmlPlayer").sendCtrlToFlash("STOP");
+	}
+	function PauseFlash() {
+		getFlashMovie("HtmlPlayer").sendCtrlToFlash("PAUSE");
+	}
+	function FFFlash() {
+		getFlashMovie("HtmlPlayer").sendCtrlToFlash("FF");
+	}
+	function RWFlash() {
+		getFlashMovie("HtmlPlayer").sendCtrlToFlash("RW");
+	}
+	function SwitchFlash() {
+		if((switchStreamList.length %2 !=0) && (switchStreamList.length <=1 )) {
+			alert("Invlid switch list"+switchStreamList.length);
+			return;
+		}
+		for(var i= 0;i<switchStreamList.length;i+=2 ) {
+			var oldstream = switchStreamList[i];
+			var newstream = switchStreamList[i+1];
+			getFlashMovie("HtmlPlayer").sendCtrlToFlash("SWITCH",oldstream,newstream);
+		}
+	}
+	function SwapFlash() {
+		if(switchStreamList.length != 2) {
+			alert("Invlid swap list");
+			return;
+		}
+		var oldstream = switchStreamList[0];
+		var newstream = switchStreamList[1];
+		getFlashMovie("HtmlPlayer").sendCtrlToFlash("SWAP",oldstream,newstream);
+	}
+	</script>
+
+	<form name="CtrlPlay" method="post" action="javascript:PlayFlash();">
+
+		<input type="button" value="Play" onclick="javascript:PlayFlash();" /> 
+		<input type="button" value="Stop" onclick="javascript:StopFlash();" /> 
+		<input type="button" value="Pause" onclick="javascript:PauseFlash();" /> 
+		<input type="button" value="FF" onclick="javascript:FFFlash();" /> 
+		<input type="button" value="RW" onclick="javascript:RWFlash();" /> 
+		<input type="button" value="SWITCH" onclick="javascript:SwitchFlash();" /> 
+		<input type="button" value="SWAP" onclick="javascript:SwapFlash();" /> 
+	</form>
+<!--<form name="statusform" method="post" action="">
+<textarea rows="10"  cols="30" name="statusinfo" ></textarea><br />
+!-->
+	<p>
+		Client Stats (NetStream Info)
+	</p>
+	<textarea rows="10"  cols="30" name="statusinfo" id="statusinfo"></textarea><br />
+</body>
+</html>

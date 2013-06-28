@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+  <title>HtmlFlashPlayer</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+</head>
+
+<body>
+
+<form name="htmlForm" method="post" action="javascript:formSend();">
+  Please input the Complete URL Here:<br />
+  <input type="text" name="sendField" value="rtmp://flash.auto.com/vod/foo.flv" /><br />
+<input type="submit" value="Start" /> <br />
+  You can see the Result here:<br />
+  <input type="text" name="PlayerResult" value="NA" /> 
+</form>
+<script type="text/javascript" language="JavaScript">
+document.write(
+  '<OBJECT classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"\n'+
+  ' codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=7,0,0,0"\n'+
+  ' WIDTH="550" HEIGHT="400" id="HtmlPlayer">\n'+
+  ' <PARAM NAME=movie VALUE="myHtmlPlayer.swf">\n'+
+  ' <PARAM NAME=quality VALUE=high>\n'+
+  ' <PARAM NAME=bgcolor VALUE=#FFFFFF>\n'+
+  ' <EMBED src="myHtmlPlayer.swf"\n'+
+  '    quality=high bgcolor=#FFFFFF  WIDTH="550" HEIGHT="400" NAME="HtmlPlayer"\n'+
+  '    TYPE="application/x-shockwave-flash"\n'+
+  '    PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer"></EMBED>\n'+  
+  '</OBJECT>');</script>
+<script type="text/javascript" language="JavaScript">
+ function getFlashMovie(movieName) {
+  var isIE = navigator.appName.indexOf("Microsoft") != -1;
+  return (isIE) ? window[movieName] : document[movieName];
+ }
+ function formSend() {
+  var inputurl = document.htmlForm.sendField.value;
+  getFlashMovie("HtmlPlayer").sendCmdToFlash(inputurl);
+  
+ }
+ 
+ function getTextFromFlash(str) {
+  document.statusform.statusinfo.value = "Flash Client Status"+"\r\n"+str;
+  return str + " received";
+ }
+  function getResultFromFlash(str) {
+  document.htmlForm.PlayerResult.value = "Flash Client Result"+str;
+  return str + " received";
+ }
+ function PlayFlash() {
+        getFlashMovie("HtmlPlayer").sendCtrlToFlash("PLAY");
+ }
+ function StopFlash() {
+        getFlashMovie("HtmlPlayer").sendCtrlToFlash("STOP");
+ }
+  function PauseFlash() {
+        getFlashMovie("HtmlPlayer").sendCtrlToFlash("PAUSE");
+ }
+  function FFFlash() {
+        getFlashMovie("HtmlPlayer").sendCtrlToFlash("FF");
+ }
+  function RWFlash() {
+        getFlashMovie("HtmlPlayer").sendCtrlToFlash("RW");
+ }</script>
+
+<form name="CtrlPlay" method="post" action="javascript:PlayFlash();">
+
+  <input type="button" value="Play" onclick="javascript:PlayFlash();" /> 
+  <input type="button" value="Stop" onclick="javascript:StopFlash();" /> 
+  <input type="button" value="Pause" onclick="javascript:PauseFlash();" /> 
+  <input type="button" value="FF" onclick="javascript:FFFlash();" /> 
+  <input type="button" value="RW" onclick="javascript:RWFlash();" /> </form>
+<form name="statusform" method="post" action="">
+<textarea rows="10"  cols="30" name="statusinfo" ></textarea><br />
+</form>
+</body>
+</html>
